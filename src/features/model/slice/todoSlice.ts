@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 import type {TodoState} from "../types"
 import {v4 as uid} from 'uuid';
 
@@ -17,11 +17,11 @@ export const todosSlice = createSlice({
 				complited: false,
 			})
 		},
-		complitedTodo: (state, action) => {
+		complitedTodo: (state, action: PayloadAction<string>) => {
 			const todo = state.todos.find((item) => item.id === action.payload)
 			if (todo) todo.complited = !todo.complited
 		},
-		deleteTodo: (state, action) => {
+		deleteTodo: (state, action: PayloadAction<string>) => {
 			state.todos = state.todos.filter((item) => item.id !== action.payload)
 		},
 	},

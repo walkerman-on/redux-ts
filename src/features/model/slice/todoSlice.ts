@@ -10,7 +10,7 @@ export const todosSlice = createSlice({
 	name: "todos",
 	initialState,
 	reducers: {
-		addTodo: (state, action) => {
+		addTodo: (state, action: PayloadAction<string>) => {
 			state.todos.push({
 				id: uid(),
 				text: action.payload,

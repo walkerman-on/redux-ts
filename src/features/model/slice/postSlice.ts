@@ -1,55 +1,37 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import axios from "axios"
+import { PayloadAction, createSlice } from "@reduxjs/toolkit"
+import { fetchPosts } from "../../api/fetchPosts"
+import { PostState } from "../types"
 
-const initialState = {
+const initialState: PostState = {
 	posts: [],
+	loading: false,
+	error: null
 }
-
-export const getPosts = createAsyncThunk(
-	"posts/getPosts",
-	async (_, { rejectwithValue, dispatch }) => {
-		const res = await axios.get("https://jsonplaceholder.typicode.com/posts")
-		dispatch(setPosts(res.data))
-		console.log(res)
-	}
-)
-
-export const deletePostsById = createAsyncThunk(
-	"posts/deletePostsById",
-	async (id, { rejectwithValue, dispatch }) => {
-		await axios.delete(`https://jsonplaceholder.typicode.com/posts/${id}"`)
-		dispatch(deletePosts(id))
-	}
-)
 
 export const postSlice = createSlice({
 	name: "posts",
 	initialState,
 	reducers: {
-		setPosts: (state, action) => {
-			state.posts = action.payload
-		},
-		deletePosts: (state, action) => {
+		deletePost: (state, action: PayloadAction<string>) => {
 			state.posts = state.posts.filter((item) => item.id !== action.payload)
 		},
 	},
 	extraReducers: (builder) => {
-		builder.addCase(getPosts.fulfilled, () =>
-			console.log("getPosts: fulfilled")
-		)
-		builder.addCase(getPosts.pending, () => console.log("getPosts: pending"))
-		builder.addCase(getPosts.rejected, () => console.log("getPosts: rejected"))
-		// builder.addCase(deletePosts.fulfilled, () =>
-		// 	console.log("deletePosts: fulfilled")
-		// )
-		// builder.addCase(deletePosts.pending, () =>
-		// 	console.log("deletePosts: pending")
-		// )
-		// builder.addCase(deletePosts.rejected, () =>
-		// 	console.log("getPosts: rejected")
-		// )
+		builder
+			.addCase(fetchPosts.fulfilled, (state, action) => {
+				state.loading = false
+				state.posts = action.payload
+			})
+			.addCase(fetchPosts.pending, (state) => {
+				state.loading = true
+				state.error = null
+			})
+			.addCase(fetchPosts.rejected, (state, action) => {
+				state.loading = false
+				// state.error = action.payload
+			})
 	},
 })
 
-export const { setPosts, deletePosts } = postSlice.actions
+export const { deletePost } = postSlice.actions
 export default postSlice.reducer
